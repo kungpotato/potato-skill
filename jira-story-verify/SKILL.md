@@ -97,7 +97,6 @@ description: >
 
 ```
 🔍 Story Readiness Check — [CARD-ID]
-Reviewed by: Claude AI  |  Date: [YYYY-MM-DD]
 ─────────────────────────────────────────
 
 1️⃣ User Story Statement      [✅ PASS / ❌ FAIL / ⚠️ PARTIAL]
@@ -125,7 +124,6 @@ Reviewed by: Claude AI  |  Date: [YYYY-MM-DD]
 
 ```
 🔍 Story Readiness Check — PROJ-142
-Reviewed by: Claude AI  |  Date: 2026-05-13
 ─────────────────────────────────────────
 
 1️⃣ User Story Statement      ✅ PASS
