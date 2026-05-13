@@ -101,6 +101,7 @@ Identify real blockers instead of symptoms.
 2. What evidence proves this?
 3. What pain/problem keeps repeating?
 4. What do you think is causing it?
+5. Is the level wrong, or is the rate wrong? (Stock or Flow problem?)
 ```
  
 ---
@@ -130,6 +131,21 @@ Analyze:
 - Why it happened
 - What failed
 - What should change
+
+### Stocks vs Flows (Thinking in Systems)
+
+Classify the problem before diagnosing:
+
+```text
+Stock problem — something that accumulates is at the wrong level
+Examples: cash depleting, trust eroding, technical debt growing
+
+Flow problem — the rate going in or out is broken
+Examples: churn too high, pipeline too slow, feedback not reaching the team
+```
+
+Ask: "Is the level wrong, or is the rate wrong?"
+Fixing a flow problem will not fix a stock problem — and vice versa.
 ---
  
 ## Output Format
@@ -164,6 +180,10 @@ Why? (5)
  
 What pattern keeps repeating?
 What assumptions may be false?
+Is there a loop feeding this problem back into itself? (Reinforcing loop)
+Is the system pushing back every time you try to fix it? (Balancing loop)
+How long is the delay between action and visible result?
+Which system archetype does this most closely match?
 ```
  
 ---
@@ -199,6 +219,65 @@ Orient
 Decide
 Act
 ```
+
+### Feedback Loop Identification (Thinking in Systems)
+
+Identify which loop is driving the problem:
+
+```text
+Reinforcing Loop (R) — amplifies itself
+The more it happens, the more it continues.
+Can drive both growth and collapse.
+Example: more debt → more interest → more debt
+
+Balancing Loop (B) — resists change
+System pushes back when you push it.
+Creates oscillation or stagnation.
+Example: try to fix symptom → problem appears elsewhere
+```
+
+Ask: "Is the problem feeding itself (R), or is the system resisting my fix (B)?"
+
+### Delays (Thinking in Systems)
+
+Delays hide the true cause-effect relationship.
+
+```text
+Common delay traps:
+- Fix works, but results take months → team abandons it too early
+- Problem was caused by a decision made 6 months ago, not yesterday
+- Reinforcing loop was already running before the visible symptom appeared
+```
+
+Ask: "How long is the delay between action and visible result in this system?"
+If you can't answer this, you don't understand the system yet.
+
+### System Archetypes (Thinking in Systems)
+
+Match the pattern to a known archetype:
+
+```text
+Shifting the Burden
+Symptom: Fix works short-term but problem keeps coming back
+Cause: Treating symptom instead of root cause
+Trap: Symptomatic fix erodes the capacity to ever solve the real problem
+
+Limits to Growth
+Symptom: Progress stalls despite more effort
+Cause: A hidden constraint (balancing loop) caps the growth
+Trap: Pushing harder tightens the constraint further
+
+Fixes that Fail
+Symptom: Fix works, then problem returns worse than before
+Cause: Delay masks unintended side effects
+
+Tragedy of the Commons
+Symptom: Each person acts rationally but the system degrades
+Cause: No feedback between individual use and shared system health
+Fix: Add shared visibility, rules, or constraints
+```
+
+Ask: "Which archetype does this most closely match?"
  
 ---
  
@@ -208,6 +287,9 @@ Act
 ROOT CAUSE:
 - Why Chain:
 - Core Failure:
+- Loop Type: R (reinforcing) / B (balancing) / both
+- Delay: [time between action and visible result]
+- Archetype: [Shifting the Burden / Limits to Growth / Fixes that Fail / other]
 - Repeating Pattern:
 - False Assumptions:
 ```
@@ -228,6 +310,9 @@ Convert solutions into repeatable systems.
 2. What actions prevent this failure?
 3. What conditions should stop execution?
 4. What can be automated?
+5. What is the highest leverage point available to change?
+6. What delays can be shortened to speed up feedback?
+7. Which feedback loop needs strengthening or weakening?
 ```
  
 ---
@@ -242,13 +327,39 @@ Create exact repeatable processes.
  
 Prevent human inconsistency.
  
-### Systems Thinking
- 
-Analyze:
-- Inputs
-- Outputs
-- Feedback loops
-- Bottlenecks
+### Leverage Points (Thinking in Systems)
+
+Intervene at the highest-leverage point you can actually reach.
+Listed from low to high impact:
+
+```text
+1. Adjust numbers/rates       — least powerful, easiest
+   Example: increase budget, reduce error rate target
+
+2. Change buffer sizes        — make stocks more resilient
+   Example: build cash reserve, create a skills bench
+
+3. Change flow rates          — fix how fast things enter or leave
+   Example: improve onboarding speed, reduce churn rate
+
+4. Strengthen/weaken loops    — change how fast the system self-corrects
+   Example: add weekly review, shorten feedback cycle from months to days
+
+5. Reduce delays              — speed up the signal
+   Example: add monitoring so failures surface in hours, not months
+
+6. Change rules/constraints   — restructure what is allowed
+   Example: add risk limit, require sign-off above threshold
+
+7. Change the goal            — what the system optimizes for
+   Example: shift from revenue growth to retention rate
+
+8. Change the paradigm        — most powerful, hardest
+   Example: shift from "fix problems as they arise" to "design systems that prevent them"
+```
+
+Ask: "What is the highest leverage point I can actually change right now?"
+
 ### Constraint-Based Design
  
 Example:
@@ -270,8 +381,11 @@ Possible tools:
  
 ```text
 SYSTEM:
+- Leverage Point: [level 1–8 + what specifically changes]
 - Rules:
 - Constraints:
+- Delays to Reduce: [what signal can arrive faster?]
+- Feedback Loops to Strengthen: [which loop, how]
 - Checklist:
 - Automations:
 - Failure Prevention:
