@@ -60,6 +60,38 @@ description: >
 - Attachments: wireframe, design link, spec
 - Labels / fields ที่เกี่ยวข้อง (เช่น feature type, platform)
 
+**Figma — บังคับตรวจทุกครั้ง:**
+- ถ้ามี Figma link ใน Jira → ใช้ **Figma MCP** อ่าน design แล้วไป Step 2b
+- ถ้าไม่มี Figma link → **ต้องถามผู้ใช้ก่อนเสมอ**: "มี Figma link สำหรับ story นี้ไหมคะ/ครับ?" รอคำตอบก่อนดำเนินการต่อ
+  - ถ้าผู้ใช้ให้ link → ใช้ Figma MCP อ่านแล้วไป Step 2b
+  - ถ้าผู้ใช้ยืนยันว่าไม่มี → ข้าม Step 2b และระบุ assumption ใน draft ว่า "ไม่มี Figma — component และ layout อ้างอิงจาก AC และ codebase pattern"
+
+### Step 2b — Reconcile Figma กับ AC
+
+ใช้ Figma MCP อ่าน design ทุก screen/state ที่เกี่ยวข้อง แล้วทำ **Figma ↔ AC Reconcile**:
+
+1. **list screen/state ทั้งหมดใน Figma** (เช่น empty state, filled form, error state, success dialog)
+2. **map แต่ละ screen → AC ข้อที่ cover**
+3. ระบุ gap 2 ทิศทาง:
+
+```
+🎨 Figma ↔ AC Reconcile
+──────────────────────────────────────────────
+[Screen/State ใน Figma]         → AC ที่ cover
+─────────────────────────────────────────────
+Register form (empty)           → AC 1, AC 3
+Register form (error — required)→ AC 4
+KYC warning alert               → AC 2
+Success dialog                  → AC 5
+
+⚠️  Gap ที่พบ:
+• Figma มี "loading skeleton" แต่ไม่มี AC ครอบคลุม → ควรเพิ่ม AC หรือแจ้ง PO?
+• AC 6 (error กรณี network timeout) ไม่มี screen ใน Figma → design ยังไม่ครบ ต้องถาม designer
+──────────────────────────────────────────────
+```
+
+4. **ถ้าพบ gap** ให้ตั้งคำถามถามผู้ใช้ในรอบถัดไปก่อนดำเนิน Step 3
+
 ### Step 3 — Scan Codebase เพื่อ Reconcile
 
 ก่อนวิเคราะห์ subtask ให้ scan codebase เพื่อทำความเข้าใจบริบทของ project จริง:
