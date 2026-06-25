@@ -91,6 +91,17 @@ description: >
 - ถ้าคำตอบเปิด gap ใหม่ ให้ถาม round ถัดไปต่อทันที
 - **หยุดถามเมื่อ**: ทุก subtask มี context ครบตามเกณฑ์ด้านล่าง
 
+**หลัก Clean Architecture ที่ codebase ใช้อยู่ — ต้องเข้าใจก่อนตั้งคำถาม:**
+
+codebase นี้ใช้ Clean Architecture ซึ่งมี separation of concerns ชัดเจน:
+```
+UI Layer → Entity (Domain) → Data Source (API/mock)
+```
+ดังนั้น:
+- **ถ้ายังไม่มี API spec** → ห้ามถามหา ให้ define entity ตาม field ที่เห็นจาก UI ได้เลย
+- เมื่อ API พร้อม developer จะ swap data source + data model แล้ว map กลับมาที่ entity เอง
+- subtask ที่เกี่ยวกับ integration (5, 6, 7) ให้ระบุ **entity shape** และ **expected behavior** ไว้แทน endpoint จริง
+
 **เกณฑ์ "มั่นใจ 100%" ของแต่ละ subtask:**
 
 | Subtask | ต้องรู้อะไรก่อนจบงานได้ |
@@ -98,9 +109,9 @@ description: >
 | 1 — Entry point + Layout | route path, layout ที่ใช้, navigation pattern, มีหน้าที่คล้ายกันใน codebase ไหม |
 | 2 — UI Components | รายการ component ทั้งหมด, ของที่ reuse ได้ vs สร้างใหม่, design/Figma link |
 | 3 — Client Validate | ทุก field + rule ครบ (required/format/length/match), validation library ที่ใช้ |
-| 4 — Alert Box Logic | condition ทุกกรณีที่ trigger alert, ข้อมูล source (API field ชื่ออะไร), behavior เมื่อ block vs warn |
-| 5 — API Validate | endpoint URL + method, request payload, response schema, timing (onBlur/onSubmit) |
-| 6 — Error Handling | HTTP status codes ทุกตัวที่ต้อง handle, inline vs dialog แต่ละ case, error message text หรือ key |
+| 4 — Alert Box Logic | condition ทุกกรณีที่ trigger alert, field ใน entity ที่ใช้ตรวจ, behavior เมื่อ block vs warn |
+| 5 — API Validate | **ถ้ามี API spec**: endpoint + response schema — **ถ้าไม่มี**: entity field ที่ต้อง validate + timing (onBlur/onSubmit) ก็เพียงพอ |
+| 6 — Error Handling | **ถ้ามี API spec**: HTTP status + error shape — **ถ้าไม่มี**: error cases ที่ต้อง handle ตาม business logic + inline vs dialog |
 | 7 — Success Flow | success condition, dialog content, action หลัง dismiss (redirect path / callback / refetch) |
 
 **Format การถาม (คงที่ทุก round):**
@@ -119,18 +130,42 @@ description: >
 (กรุณาตอบให้ครบทุกข้อก่อนไปขั้นต่อไป)
 ```
 
-### Step 5 — สร้าง subtask draft
+### Step 5 — ตรวจ AC Coverage ก่อนสร้าง draft
 
-เมื่อมั่นใจ 100% แล้ว สร้างรายการ subtask ตาม template ด้านล่าง แสดงให้ผู้ใช้ review ก่อน
+ก่อนสร้าง draft ให้ทำ **AC Coverage Check** — ตรวจว่า subtask ทั้งหมดครอบคลุม Acceptance Criteria ทุกข้อจาก Jira story ครบ 100%
+
+**วิธีตรวจ:**
+1. list AC ทุกข้อจาก Jira story
+2. map แต่ละ AC → subtask ที่รับผิดชอบ
+3. ถ้า AC ข้อไหนไม่มี subtask รับ → ต้องแก้ไขก่อน (เพิ่มงานใน subtask ที่เหมาะสม หรือตั้งคำถาม round ใหม่)
+4. **ห้ามสร้าง draft จนกว่า AC ทุกข้อจะมี subtask รับผิดชอบครบ**
+
+**Format AC Coverage (แสดงก่อน draft เสมอ):**
+```
+✅ AC Coverage Check
+──────────────────────────────────────────────
+AC 1: [ข้อความ AC] → Subtask [X]
+AC 2: [ข้อความ AC] → Subtask [X, Y]
+AC 3: [ข้อความ AC] → ❌ ยังไม่มี subtask รับ → [วิธีแก้]
+──────────────────────────────────────────────
+Coverage: [N/N] AC ✅
+```
+
+ถ้า Coverage ไม่ครบ 100% ให้กลับไปถาม round ใหม่ก่อน ห้ามข้ามไป draft
+
+### Step 6 — สร้าง subtask draft
+
+เมื่อ AC Coverage = 100% แล้ว สร้างรายการ subtask ตาม template ด้านล่าง แสดงให้ผู้ใช้ review ก่อน
 แต่ละ subtask ต้องมี:
 - **งานที่ต้องทำ** (what to build)
+- **AC ที่ subtask นี้รับผิดชอบ**
 - **ของที่ reuse ได้จาก codebase** (ถ้ามี)
 - **ของที่ต้องสร้างใหม่**
 - **dependency** กับ subtask อื่น (ถ้ามี)
 
 ### Step 6 — ขอ confirm แล้วสร้างใน Jira
 
-ก่อนสร้าง subtask ใน Jira ให้แสดง draft และถามว่า:
+ก่อนสร้าง subtask ใน Jira ให้แสดง AC Coverage Check + draft และถามว่า:
 > "จะสร้าง subtask เหล่านี้ใน [CARD-ID] เลยนะคะ/ครับ?"
 รอ confirm แล้วค่อยสร้าง subtask ผ่าน Chrome โดย link เป็น child issue ของ story card
 
@@ -239,8 +274,10 @@ Subtask 7 — Handle success dialog
 
 - **ลำดับ subtask คงที่เสมอ**: UI (1→2) → Validate (3) → Integrate (4→7) ห้ามสลับ
 - **ทุก subtask ต้องมีชื่อตรงตาม template** — ห้ามเปลี่ยนชื่อหัวข้อ เพิ่มแค่รายละเอียดใน body
-- **ห้ามสมมุติ** ข้อมูลที่ไม่มีใน Jira หรือ codebase — ให้ตั้งคำถามถามผู้ใช้แทนเสมอ
+- **Clean Architecture**: ถ้าไม่มี API spec ให้ define entity จาก UI field ไปก่อน — ห้ามถามหา API spec ถ้ายังไม่มี เพราะ data source swap ได้ภายหลัง
+- **ห้ามสมมุติ** business logic หรือ UI behavior ที่ไม่มีใน Jira หรือ codebase — ให้ตั้งคำถามถามผู้ใช้แทนเสมอ
 - **ห้ามข้าม Step 3 (scan codebase)** แม้ story ดูชัดเจน — gap มักซ่อนอยู่ใน pattern จริงของ project
 - **ห้ามรวม gap หลาย round เป็น round เดียว** — ถามเฉพาะสิ่งที่รู้แล้วว่าไม่รู้ในแต่ละ round
+- **AC Coverage ต้องครบ 100% ก่อนสร้าง draft** — ถ้า AC ข้อไหนยังไม่มี subtask รับ ให้กลับไปถามก่อนเสมอ
 - **Jira session ต้อง login อยู่แล้ว** — ถ้าเจอหน้า login ให้แจ้งผู้ใช้ก่อน
 - **ห้ามสร้าง subtask ใน Jira โดยไม่ขอ confirm** จากผู้ใช้ก่อนทุกครั้ง
