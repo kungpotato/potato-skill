@@ -1,15 +1,16 @@
 ---
 name: subtask-creator
 description: >
-  ใช้ skill นี้ทุกครั้งที่ผู้ใช้ต้องการแตก Jira story ออกเป็น subtask ตามโครงสร้าง
-  UI → Validate → Integrate ให้โดยอัตโนมัติ
+  ใช้ skill นี้ทุกครั้งที่ผู้ใช้ต้องการแตก Jira story หรือทุก story ใน Epic ออกเป็น subtask
+  ตามโครงสร้าง UI → Validate → Integrate ให้โดยอัตโนมัติ
   Trigger เมื่อผู้ใช้พูดถึง: "แตก subtask", "create subtask", "แบ่ง task", "breakdown story",
-  "สร้าง subtask จาก jira", หรือส่ง Jira URL / card ID มาพร้อมขอให้แตก subtask
+  "สร้าง subtask จาก jira", "breakdown epic", "แตก subtask ทุก story ใน epic",
+  หรือส่ง Jira URL ของ Story หรือ Epic มาพร้อมขอให้แตก subtask
 ---
 
 # Subtask Creator Skill
 
-อ่าน Jira story แล้ววิเคราะห์และสร้าง subtask ตามโครงสร้าง 3 กลุ่ม: **UI → Validate → Integrate**
+รับ Jira Story หรือ Epic URL แล้ววิเคราะห์และสร้าง subtask ตามโครงสร้าง 3 กลุ่ม: **UI → Validate → Integrate**
 
 ---
 
@@ -46,11 +47,59 @@ description: >
 
 ## ขั้นตอนการทำงาน
 
-### Step 1 — รับ input
+### Step 1 — รับ input และตรวจประเภท card
 
 รับข้อมูลจากผู้ใช้:
-- Jira story URL หรือ card ID (เช่น `PROJ-123`)
-- ถ้าไม่ได้ให้มา ให้ถามก่อน: "กรุณาระบุ Jira story URL หรือ card ID ที่ต้องการแตก subtask"
+- Jira URL หรือ card ID (เช่น `PROJ-123` หรือ Epic URL)
+- ถ้าไม่ได้ให้มา ให้ถามก่อน: "กรุณาระบุ Jira Story หรือ Epic URL ที่ต้องการแตก subtask"
+
+**ตรวจประเภท card ด้วย Claude in Chrome:**
+- ถ้าเป็น **Story** → ดำเนิน Step 2 กับ story นั้นตรงๆ
+- ถ้าเป็น **Epic** → ดำเนิน Step 1b ก่อน
+
+### Step 1b — Epic Mode: ดึง story ทั้งหมดใน Epic
+
+ใช้ `Claude in Chrome` เปิด Epic แล้ว:
+1. อ่านรายการ story ทุกใบที่อยู่ใน Epic (child issues / stories linked to epic)
+2. แสดง story list ให้ผู้ใช้เห็นก่อน:
+
+```
+📦 Epic: [EPIC-ID] — [Epic Title]
+──────────────────────────────────────────────
+Story ที่พบ ([N] stories):
+  1. [PROJ-101] — [Story Title]
+  2. [PROJ-102] — [Story Title]
+  3. [PROJ-103] — [Story Title]
+  ...
+──────────────────────────────────────────────
+จะดำเนินการแตก subtask ทุก [N] stories ตามลำดับ
+Story ไหนต้องการข้ามบ้างไหมคะ/ครับ? (ถ้าไม่มีตอบ "ไม่มี" ได้เลย)
+```
+
+3. รอ confirm จากผู้ใช้ก่อน จากนั้น**วน loop ทำ Step 2–7 ทีละ story** จนครบทุกใบ
+
+**Epic Loop — กฎการวน:**
+- ทำทีละ story ตามลำดับ ห้ามข้าม
+- ทุก story ต้องผ่าน Step 2–7 ครบ (อ่าน Jira → Figma → scan code → ถาม → AC check → draft → confirm) ก่อนไป story ถัดไป
+- แสดง progress ทุกครั้งที่เริ่ม story ใหม่:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 กำลังทำ Story [N/Total]: [PROJ-XXX] — [Title]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+- เมื่อครบทุก story แสดง Epic summary:
+
+```
+🎉 Epic Breakdown เสร็จสมบูรณ์
+──────────────────────────────────────────────
+[PROJ-101] ✅ สร้าง 7 subtask
+[PROJ-102] ✅ สร้าง 5 subtask (2 N/A)
+[PROJ-103] ✅ สร้าง 6 subtask
+──────────────────────────────────────────────
+รวม [N] subtask ทั้ง Epic
+```
 
 ### Step 2 — เปิดและอ่าน Jira story
 
